@@ -1,10 +1,8 @@
-// app/page.tsx
 import Link from "next/link";
 
 export default function Home() {
   return (
     <main className="min-h-screen">
-      {/* Hero */}
       <section className="bg-gradient-to-br from-purple-50 to-pink-50 py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-7xl font-bold text-purple-800 mb-6">
@@ -31,7 +29,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Beneficios */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-purple-800 mb-12">
