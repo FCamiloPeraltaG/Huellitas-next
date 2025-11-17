@@ -8,23 +8,31 @@ export default function PerfilPage() {
   const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadProfile = async () => {
       const token = localStorage.getItem("token");
-      const userId = localStorage.getItem("userId");
+      if (!token) return;
 
-      if (!token || !userId) return;
+      try {
+        const res = await fetch("http://localhost:8080/usuarios/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      const res = await fetch(`http://localhost:8080/usuarios/id/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+        if (!res.ok) {
+          console.error("Error al cargar perfil");
+          return;
+        }
 
-      const data = await res.json();
-      setUser(data);
+        const data = await res.json();
+        setUser(data);
+
+      } catch (error) {
+        console.error("Error del servidor:", error);
+      }
     };
 
-    loadUser();
+    loadProfile();
   }, []);
 
   if (!user) return <p className="p-10">Cargando perfil...</p>;
@@ -49,7 +57,11 @@ export default function PerfilPage() {
       </div>
 
       {openModal && (
-        <EditProfileModal user={user} setOpen={setOpenModal} setUser={setUser} />
+        <EditProfileModal 
+          user={user} 
+          setOpen={setOpenModal} 
+          setUser={setUser} 
+        />
       )}
     </main>
   );
