@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${geist.className} antialiased bg-gray-50`}>
         <CartProvider>
-          <Header />   {/* El header será client-component */}
+          <Header />
 
           <main className="min-h-screen">        
             {children}
