@@ -33,6 +33,7 @@ export default function Login() {
         });
 
         localStorage.setItem("token", data.token);
+        localStorage.setItem("email", data.email); 
         router.push("/productos");
       } else {
         const err = await res.json();

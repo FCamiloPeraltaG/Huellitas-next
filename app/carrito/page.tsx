@@ -13,6 +13,64 @@ export default function CarritoPage() {
 
   const total = cart.reduce((sum, p) => sum + p.precio * p.cantidad, 0);
 
+  // -------------------------
+  //  FINALIZAR COMPRA
+  // -------------------------
+  const realizarCompra = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Debes iniciar sesión primero");
+      return;
+    }
+
+    if (cart.length === 0) {
+      alert("Tu carrito está vacío");
+      return;
+    }
+
+    // Backend espera LISTA de detalles
+    const items = cart.map((item) => ({
+      cantidad: item.cantidad,
+      precioUnitario: item.precio,
+      subtotal: item.precio * item.cantidad,
+      producto: { idProducto: item.idProducto },
+    }));
+
+    try {
+      const response = await fetch("http://localhost:8080/pedidos/crear", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(items),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Backend error:", errorText);
+        throw new Error("Error al procesar el pedido");
+      }
+
+      const pedidoCreado = await response.json();
+
+      // GUARDAR EL PEDIDO EN LOCALSTORAGE
+      localStorage.setItem("ultimoPedido", JSON.stringify(pedidoCreado));
+
+      alert("Compra realizada con éxito 🎉");
+
+      clearCart();
+      window.location.href = "/compra-exitosa"; // Página de éxito
+    } catch (error) {
+      console.error(error);
+      alert("Error al realizar la compra");
+    }
+  };
+
+  // -------------------------
+  //  UI DEL CARRITO
+  // -------------------------
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Mi Carrito 🛒</h1>
@@ -26,21 +84,18 @@ export default function CarritoPage() {
               key={item.idProducto}
               className="flex items-center gap-4 border p-4 rounded-lg mb-4 bg-white shadow"
             >
-              {/* IMAGEN */}
               <img
                 src={item.imageneUrl}
                 alt={item.nombre}
                 className="w-24 h-24 object-cover rounded"
               />
 
-              {/* INFO */}
               <div className="flex-1">
                 <h2 className="text-xl font-bold">{item.nombre}</h2>
                 <p className="text-gray-600">
                   Precio: <span className="font-semibold">${item.precio}</span>
                 </p>
 
-                {/* CANTIDAD */}
                 <div className="mt-2 flex items-center gap-2">
                   <button
                     className="px-2 bg-gray-300 rounded"
@@ -48,7 +103,9 @@ export default function CarritoPage() {
                   >
                     -
                   </button>
+
                   <span className="font-semibold">{item.cantidad}</span>
+
                   <button
                     className="px-2 bg-gray-300 rounded"
                     onClick={() => increaseQuantity(item.idProducto)}
@@ -62,7 +119,6 @@ export default function CarritoPage() {
                 </p>
               </div>
 
-              {/* ELIMINAR */}
               <button
                 className="text-red-500 font-semibold hover:underline"
                 onClick={() => removeFromCart(item.idProducto)}
@@ -72,15 +128,13 @@ export default function CarritoPage() {
             </div>
           ))}
 
-          {/* TOTAL */}
           <h2 className="text-2xl font-bold mt-4">
             Total: <span className="text-green-600">${total}</span>
           </h2>
 
-          {/* ACCIONES */}
           <button
             className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg w-full font-semibold hover:bg-green-700"
-            onClick={() => alert("Acá luego conectamos la compra 😎")}
+            onClick={realizarCompra}
           >
             Finalizar compra
           </button>
