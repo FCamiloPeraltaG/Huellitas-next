@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("http://localhost:8080/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -22,10 +23,27 @@ export default function Login() {
 
       if (res.ok) {
         const data = await res.json();
+
+        await Swal.fire({
+          icon: "success",
+          title: "¡Bienvenido!",
+          text: "Inicio de sesión exitoso",
+          confirmButtonText: "Continuar",
+          confirmButtonColor: "#9333ea",
+        });
+
         localStorage.setItem("token", data.token);
         router.push("/productos");
       } else {
         const err = await res.json();
+
+        await Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: err.message || "Credenciales inválidas",
+          confirmButtonColor: "#ef4444",
+        });
+
         setError(err.message || "Credenciales inválidas");
       }
     } catch {
