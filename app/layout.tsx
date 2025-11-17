@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${geist.className} antialiased bg-gray-50`}>
-        <Header />   {/* El header será client-component */}
+        <Header />
 
         <main className="min-h-screen">{children}</main>
 
