@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import EditProfileModal from "./EditProfileModal";
+import Swal from "sweetalert2";
 
 export default function PerfilPage() {
   const [user, setUser] = useState<any>(null);
   const [openModal, setOpenModal] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -35,25 +38,41 @@ export default function PerfilPage() {
     loadProfile();
   }, []);
 
-  if (!user) return <p className="p-10">Cargando perfil...</p>;
+  if (!user) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p className="text-lg text-purple-600">Cargando perfil...</p>
+      </main>
+    );
+  }
 
   return (
-    <main className="max-w-3xl mx-auto p-6">
-      <h1 className="text-4xl font-bold text-purple-700 mb-6">Mi Perfil</h1>
+    <main className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-4xl font-bold text-purple-700 mb-8 text-center">
+          Mi Perfil
+        </h1>
 
-      <div className="bg-white shadow-md rounded-xl p-6">
-        <p><strong>Nombre:</strong> {user.nombre} {user.apellido}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Dirección:</strong> {user.direccion}</p>
-        <p><strong>Teléfono:</strong> {user.telefono}</p>
-        <p><strong>Username:</strong> {user.username}</p>
+        <div className="bg-white shadow-lg rounded-xl p-8">
+          <div className="space-y-4 text-lg">
+            <p><strong>Nombre:</strong> {user.nombre} {user.apellido}</p>
+            <p><strong>Email:</strong> {user.email}</p>
+            <p><strong>Dirección:</strong> {user.direccion || "No especificada"}</p>
+            <p><strong>Teléfono:</strong> {user.telefono || "No especificado"}</p>
+            <p><strong>Username:</strong> {user.username}</p>
+          </div>
 
-        <button
-          onClick={() => setOpenModal(true)}
-          className="mt-5 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
-        >
-          Editar perfil
-        </button>
+          <button
+            onClick={() => setOpenModal(true)}
+            className="mt-8 w-full px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition"
+          >
+            Editar Perfil
+          </button>
+        </div>
+
+        {openModal && (
+          <EditProfileModal user={user} setOpen={setOpenModal} setUser={setUser} />
+        )}
       </div>
 
       {openModal && (
